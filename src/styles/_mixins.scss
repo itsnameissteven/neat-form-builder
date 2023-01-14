@@ -1,0 +1,132 @@
+$mobile-width: 500px;
+$tablet-width: 1024px;
+
+@mixin tablet {
+  @media (max-width: #{$tablet-width}) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: #{$mobile-width}) {
+    @content;
+  }
+}
+
+@mixin flexStandard {
+  display: flex;
+  align-items: center;
+}
+
+@mixin flexCenterCenter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flexSpaceBetween {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flexColumnCenter {
+  @include flexColumn;
+  align-items: center;
+}
+
+@mixin basicGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-column-gap: 20px;
+  grid-row-gap: 40px;
+  align-items: start;
+  justify-items: center;
+  @include mobile {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-column-gap: 10px;
+    grid-row-gap: 20px;
+  }
+}
+
+@mixin fade($time: 200ms) {
+  animation: fadeIn $time ease-in;
+}
+
+@function poly($angle: 30, $percent: false) {
+  @if $percent {
+    $op: #{100-$angle}#{'%'};
+    $an: #{$angle}#{'%'};
+
+    @return polygon(
+      $an 0%,
+      $op 0%,
+      100% $an,
+      100% $op,
+      $op 100%,
+      $an 100%,
+      0% $op,
+      0% $an
+    );
+  }
+  $px: #{$angle}#{'px'};
+  @return polygon(
+    $px 0%,
+    calc(100% - #{$px}) 0%,
+    100% $px,
+    100% calc(100% - #{$px}),
+    calc(100% - #{$px}) 100%,
+    $px 100%,
+    0% calc(100% - #{$px}),
+    0% $px
+  );
+}
+@mixin clip($padding, $angle: 18, $percent: false) {
+  padding: $padding;
+  clip-path: poly($angle, $percent);
+}
+
+@mixin set1 {
+  font-feature-settings: 'ss01';
+}
+
+@mixin set2 {
+  font-feature-settings: 'ss02';
+}
+@mixin set3 {
+  font-feature-settings: 'ss03';
+}
+@mixin set4 {
+  font-feature-settings: 'ss04';
+}
+
+@mixin boxShaddow($opacity: -0.8) {
+  box-shadow: 0 1px 1px adjust-color($retroBlack, $alpha: $opacity),
+    0 2px 2px adjust-color($retroBlack, $alpha: $opacity),
+    0 4px 4px adjust-color($retroBlack, $alpha: $opacity),
+    0 8px 8px adjust-color($retroBlack, $alpha: $opacity);
+}
+
+@mixin errorBorder {
+  border: 2px solid $errorRed;
+  &:focus-visible {
+    outline: $errorRed solid 2px;
+    outline-offset: -2px;
+  }
+}
+
+@mixin inputBorder {
+  border: 2px solid lighten($retroBlack, 30%);
+  border-radius: 5px;
+  transition: box-shadow 100ms ease-out;
+  &:focus-visible {
+    @include boxShaddow(-0.95);
+    outline: $retroBlack solid 2px;
+    outline-offset: -2px;
+  }
+}
