@@ -24,8 +24,7 @@ const Input = forwardRef(
   ) => {
     // Return
     return (
-      <label>
-        {label}
+
         <Element
           ref={ref}
           {...props}
@@ -34,7 +33,6 @@ const Input = forwardRef(
             error: isError,
           })}
         />
-      </label>
     );
   }
 );
