@@ -12,6 +12,7 @@ import {
 const useFormBuilder = <T extends IBaseValue>({
   data,
   onSubmit,
+  resetOnSubmit = false,
 }: IOptions<T>) => {
   const [formState, formDispatch] = useReducer(
     formReducer,
@@ -46,7 +47,8 @@ const useFormBuilder = <T extends IBaseValue>({
   const handleSubmit = useCallback(() => {
     if (formState.getisValid()) {
       onSubmit(returnNewValues().inputs);
-      formDispatch({ type: 'RESET', payload: getInitialData(data) });
+      resetOnSubmit &&
+        formDispatch({ type: 'RESET', payload: getInitialData(data) });
     }
   }, [formState, data, onSubmit, returnNewValues]);
 

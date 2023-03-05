@@ -1,7 +1,7 @@
 {
   "name": "neat-form-builder",
   "private": false,
-  "version": "0.0.22-beta",
+  "version": "0.0.25-beta",
   "main": "./dist/my-lib.es.js",
   "module": "./dist/my-lib.es.js",
   "types": "./dist/my-lib.es.d.ts",

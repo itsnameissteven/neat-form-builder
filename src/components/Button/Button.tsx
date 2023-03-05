@@ -1,13 +1,5 @@
 import React from 'react';
-
-// Hooks
-
-// Components
 import { Element } from '..';
-
-// Utils
-
-// Styles
 import './Button.scss';
 
 // Interfaces and Types
