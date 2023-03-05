@@ -17,14 +17,21 @@ export interface IFormBuilderProps {
   /** Action on Submit when form is valid */
   onSubmit: (data: FormInputDef) => void;
   data: FormInputDef;
+  resetOnSubmit?: boolean;
 }
 
-const FormBuilder = ({ className = '', onSubmit, data }: IFormBuilderProps) => {
+const FormBuilder = ({
+  className = '',
+  onSubmit,
+  data,
+  resetOnSubmit = false,
+}: IFormBuilderProps) => {
   // State
   const { formInputs, handleChange, handleTouch, handleSubmit } =
     useFormBuilder({
       data,
       onSubmit,
+      resetOnSubmit,
     });
 
   // Hooks
@@ -66,7 +73,7 @@ const FormBuilder = ({ className = '', onSubmit, data }: IFormBuilderProps) => {
         }
         return null;
       })}
-      <Button onClick={handleSubmit}>Send</Button>
+      <Button onClick={handleSubmit}>Submit</Button>
     </div>
   );
 };

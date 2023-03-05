@@ -18,6 +18,7 @@ declare global {
   interface IOptions<T extends IBaseValue> {
     data: T[];
     onSubmit: (data: FormInputDef) => void;
+    resetOnSubmit?: boolean;
   }
   type FormInputDef<T extends {} = {}> = (IBaseValue & T)[];
   type FormAction =
