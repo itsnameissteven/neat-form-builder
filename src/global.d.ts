@@ -1,3 +1,5 @@
+// Polymophic types
+
 interface Handler {
   target: {
     name: string;
@@ -31,39 +33,61 @@ type PolymorphicComponent = <C extends React.ElementType = 'span'>(
 type PolymorphicRef<C extends React.ElementType = 'span'> =
   React.ComponentPropsWithRef<C>['ref'];
 
-////// FormBuilder helpers
 
-// type IBaseValue = {
-//   type: 'input' | 'select' | 'textarea' | 'submit'; // etc
-//   value: string;
-//   id: string;
-//   placeholder?: string;
-//   errorMessage?: string;
-//   required?: boolean;
-//   label?: string;
-// };
+//// FormBuilder helpers
 
-// interface IOptions<T extends IBaseValue> {
-//   data: T[];
-//   onSubmit: (data: FormInputDef) => void;
-// }
-// type FormInputDef<T extends {} = {}> = (IBaseValue & T)[];
-// type FormAction =
-//   | { type: 'INPUT'; payload: { id: string; value: string } }
-//   | { type: 'TOUCH'; payload: string }
-//   | { type: 'RESET'; payload: FormState };
+//////// Current component types with requred props
+type FBInput = React.HTMLProps<'input'> & {
+  componentType: 'input'
+  id: string;
+  value: string;
+}
+type FBTextArea = React.HTMLProps<'textarea'> & {
+  componentType: 'textarea';
+  id: string;
+  value: string;
+}
 
-// type CleanedInput<T extends IBaseValue> = T & {
-//   priority: number;
-//   getIsError: () => boolean;
-//   isTouched: boolean;
-//   displayError: () => boolean;
-// };
+type FBComponentTypes = FBInput | FBTextArea; 
 
-// interface IGetNewInputsArgs {
-//   inputs: FormInputs;
-//   key: string;
-//   value: string;
-// }
+//////// Conditional Typing
+type FBBaseValue <T extends FBComponentTypes = FBComponentTypes>= T extends {componentType: 'input'} ? FBInput : FBTextArea
 
-// type TouchArgs = Omit<IGetNewInputsArgs, 'value'>;
+
+//////// Reducer types 
+type FormState <T extends FBBaseValue> = {
+  inputs: {
+      [key: string]: CleanedInput<T>;
+  };
+  getisValid: () => boolean;
+}
+///////////// Adds extra properties to user provided data
+type CleanedInput<T extends FBBaseValue> = T & {
+  priority: number;
+  getIsError: () => boolean;
+  isTouched: boolean;
+  displayError: () => boolean;
+};
+type FormInputs <T extends FBBaseValue>= FormState<T>['inputs'];
+
+type FormAction <T extends FBBaseValue>=
+  | { type: 'INPUT'; payload: { id: string; value: string } }
+  | { type: 'TOUCH'; payload: string }
+  | { type: 'RESET'; payload: FormState<T> };
+
+type IGetNewInputsArgs <T extends FBBaseValue>= {
+  inputs: FormInputs<T>;
+  key: string;
+  value: string;
+}
+
+type TouchArgs <T extends FBBaseValue>= Omit<IGetNewInputsArgs<T>, 'value'>;
+  
+//////// A type type user can utilize when passing to hook (to ensure currect data is being sent/ use elsewhere)
+type FormInputDef<T extends FBBaseValue = FBBaseValue> = T[];
+  
+interface IOptions<T extends FBBaseValue> {
+  data: T[];
+  onSubmit: (data: FormInputDef<T>) => void;
+  resetOnSubmit?: boolean;
+}

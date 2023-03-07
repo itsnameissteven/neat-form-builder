@@ -1,78 +1,7 @@
-import { Component } from 'react';
-import { Element } from '..';
+
 /////////////////////////////////
 /// Format initial Data
 /////////////////////////////////
-
-
-const t: FBInput = {
-  componentType: 'input',
-  id: '',
-  value: '',
-}
-
-// type ComponentTypes = 'input' | 
-
-
-declare global {
-  type FBInput = React.HTMLProps<'input'> & {
-    componentType: 'input'
-    id: string;
-    value: string;
-  }
-  type FBTextArea = React.HTMLProps<'textarea'> & {
-    componentType: 'textarea';
-    id: string;
-    value: string;
-  }
-
-  type FBComponentTypes = FBInput | FBTextArea; 
-  
-  type FBBaseValue <T extends FBComponentTypes = FBComponentTypes>= T extends {componentType: 'input'} ? FBInput : FBTextArea
-  // type FormState = ReturnType<typeof getInitialData>;
-  type FormState <T extends FBBaseValue> = {
-    inputs: {
-        [key: string]: CleanedInput<T>;
-    };
-    getisValid: () => boolean;
-  }
-  type FormInputs <T extends FBBaseValue>= FormState<T>['inputs'];
-  // type IBaseValue = {
-  //   type: 'input' | 'select' | 'textarea' | 'submit'; // etc
-  //   value: string;
-  //   id: string;
-  //   placeholder?: string;
-  //   errorMessage?: string;
-  //   required?: boolean;
-  //   label?: string;
-  // };
-
-  interface IOptions<T extends FBBaseValue> {
-    data: T[];
-    onSubmit: (data: FormInputDef<T>) => void;
-    resetOnSubmit?: boolean;
-  }
-  type FormInputDef<T extends FBBaseValue = FBBaseValue> = T[];
-  type FormAction <T extends FBBaseValue>=
-    | { type: 'INPUT'; payload: { id: string; value: string } }
-    | { type: 'TOUCH'; payload: string }
-    | { type: 'RESET'; payload: FormState<T> };
-
-  type CleanedInput<T extends FBBaseValue> = T & {
-    priority: number;
-    getIsError: () => boolean;
-    isTouched: boolean;
-    displayError: () => boolean;
-  };
-
-  type IGetNewInputsArgs <T extends FBBaseValue>= {
-    inputs: FormInputs<T>;
-    key: string;
-    value: string;
-  }
-
-  type TouchArgs <T extends FBBaseValue>= Omit<IGetNewInputsArgs<T>, 'value'>;
-}
 
 export const getInitialData = <T extends FBBaseValue>(data: T[]) => {
   const cleanedData = data.reduce(
@@ -120,6 +49,7 @@ const getNewInputs = <T extends FBBaseValue>({
     },
   };
 };
+
 const touch = <T extends FBBaseValue>({ inputs, key }: TouchArgs<T>): FormInputs<T> => {
   return {
     ...inputs,
@@ -155,7 +85,8 @@ export const formReducer = <T extends FBBaseValue>(state: FormState<T>, action: 
   return state;
 };
 
-export const getValues = <T extends FBBaseValue>(
+// Returns the original data with user interactive values
+export const getUpdatedValues = <T extends FBBaseValue>(
   formState: FormState<T>,
   inputs: T[]
 ) => {
