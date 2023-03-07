@@ -1,48 +1,80 @@
+import { Component } from 'react';
+import { Element } from '..';
 /////////////////////////////////
 /// Format initial Data
 /////////////////////////////////
 
-declare global {
-  type FormState = ReturnType<typeof getInitialData>;
-  type FormInputs = FormState['inputs'];
-  type IBaseValue = {
-    type: 'input' | 'select' | 'textarea' | 'submit'; // etc
-    value: string;
-    id: string;
-    placeholder?: string;
-    errorMessage?: string;
-    required?: boolean;
-    label?: string;
-  };
 
-  interface IOptions<T extends IBaseValue> {
+const t: FBInput = {
+  componentType: 'input',
+  id: '',
+  value: '',
+}
+
+// type ComponentTypes = 'input' | 
+
+
+declare global {
+  type FBInput = React.HTMLProps<'input'> & {
+    componentType: 'input'
+    id: string;
+    value: string;
+  }
+  type FBTextArea = React.HTMLProps<'textarea'> & {
+    componentType: 'textarea';
+    id: string;
+    value: string;
+  }
+
+  type FBComponentTypes = FBInput | FBTextArea; 
+  
+  type FBBaseValue <T extends FBComponentTypes = FBComponentTypes>= T extends {componentType: 'input'} ? FBInput : FBTextArea
+  // type FormState = ReturnType<typeof getInitialData>;
+  type FormState <T extends FBBaseValue> = {
+    inputs: {
+        [key: string]: CleanedInput<T>;
+    };
+    getisValid: () => boolean;
+  }
+  type FormInputs <T extends FBBaseValue>= FormState<T>['inputs'];
+  // type IBaseValue = {
+  //   type: 'input' | 'select' | 'textarea' | 'submit'; // etc
+  //   value: string;
+  //   id: string;
+  //   placeholder?: string;
+  //   errorMessage?: string;
+  //   required?: boolean;
+  //   label?: string;
+  // };
+
+  interface IOptions<T extends FBBaseValue> {
     data: T[];
-    onSubmit: (data: FormInputDef) => void;
+    onSubmit: (data: FormInputDef<T>) => void;
     resetOnSubmit?: boolean;
   }
-  type FormInputDef<T extends {} = {}> = (IBaseValue & T)[];
-  type FormAction =
+  type FormInputDef<T extends FBBaseValue = FBBaseValue> = T[];
+  type FormAction <T extends FBBaseValue>=
     | { type: 'INPUT'; payload: { id: string; value: string } }
     | { type: 'TOUCH'; payload: string }
-    | { type: 'RESET'; payload: FormState };
+    | { type: 'RESET'; payload: FormState<T> };
 
-  type CleanedInput<T extends IBaseValue> = T & {
+  type CleanedInput<T extends FBBaseValue> = T & {
     priority: number;
     getIsError: () => boolean;
     isTouched: boolean;
     displayError: () => boolean;
   };
 
-  interface IGetNewInputsArgs {
-    inputs: FormInputs;
+  type IGetNewInputsArgs <T extends FBBaseValue>= {
+    inputs: FormInputs<T>;
     key: string;
     value: string;
   }
 
-  type TouchArgs = Omit<IGetNewInputsArgs, 'value'>;
+  type TouchArgs <T extends FBBaseValue>= Omit<IGetNewInputsArgs<T>, 'value'>;
 }
 
-export const getInitialData = <T extends IBaseValue>(data: T[]) => {
+export const getInitialData = <T extends FBBaseValue>(data: T[]) => {
   const cleanedData = data.reduce(
     (
       acc: {
@@ -75,11 +107,11 @@ export const getInitialData = <T extends IBaseValue>(data: T[]) => {
   };
 };
 
-const getNewInputs = ({
+const getNewInputs = <T extends FBBaseValue>({
   inputs,
   key,
   value,
-}: IGetNewInputsArgs): FormInputs => {
+}: IGetNewInputsArgs<T>)=> {
   return {
     ...inputs,
     [key]: {
@@ -88,7 +120,7 @@ const getNewInputs = ({
     },
   };
 };
-const touch = ({ inputs, key }: TouchArgs): FormInputs => {
+const touch = <T extends FBBaseValue>({ inputs, key }: TouchArgs<T>): FormInputs<T> => {
   return {
     ...inputs,
     [key]: {
@@ -98,7 +130,7 @@ const touch = ({ inputs, key }: TouchArgs): FormInputs => {
   };
 };
 
-export const formReducer = (state: FormState, action: FormAction) => {
+export const formReducer = <T extends FBBaseValue>(state: FormState<T>, action: FormAction<T>) => {
   const { type } = action;
   if (type === 'INPUT') {
     const newInputs = getNewInputs({
@@ -123,8 +155,8 @@ export const formReducer = (state: FormState, action: FormAction) => {
   return state;
 };
 
-export const getValues = <T extends IBaseValue>(
-  formState: FormState,
+export const getValues = <T extends FBBaseValue>(
+  formState: FormState<T>,
   inputs: T[]
 ) => {
   // use data map and replace with new values, remove any added valus for

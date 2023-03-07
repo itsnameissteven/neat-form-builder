@@ -11,21 +11,21 @@ import './FormBuilder.scss';
 
 // Interfaces and Types
 
-export interface IFormBuilderProps {
+export interface IFormBuilderProps <T extends FBBaseValue> {
   /** Optional classname to pass to parent container */
   className?: string;
   /** Action on Submit when form is valid */
-  onSubmit: (data: FormInputDef) => void;
-  data: FormInputDef;
+  onSubmit: (data: FormInputDef<T>) => void;
+  data: FormInputDef<T>;
   resetOnSubmit?: boolean;
 }
 
-const FormBuilder = ({
+const FormBuilder = <T extends FBBaseValue>({
   className = '',
   onSubmit,
   data,
   resetOnSubmit = false,
-}: IFormBuilderProps) => {
+}: IFormBuilderProps<T>) => {
   // State
   const { formInputs, handleChange, handleTouch, handleSubmit } =
     useFormBuilder({
@@ -44,8 +44,8 @@ const FormBuilder = ({
   return (
     <div className={`form-builder ${className}`}>
       {formInputs.map((val) => {
-        const { type, id, priority, value, placeholder } = val;
-        if (type === 'input') {
+        const { componentType, id, priority, value, placeholder } = val;
+        if (componentType === 'input') {
           return (
             <Input
               key={`${id}`}
@@ -58,7 +58,7 @@ const FormBuilder = ({
             />
           );
         }
-        if (type === 'textarea') {
+        if (componentType === 'textarea') {
           return (
             <Textarea
               key={`${id}-${priority}`}

@@ -3,26 +3,27 @@ import { FormBuilder } from './components';
 
 const inputs: FormInputDef = [
   {
-    type: 'input',
+    componentType: 'input',
     id: 'fullName',
     value: '',
     placeholder: 'Name',
     required: true,
   },
   {
-    type: 'input',
+    componentType: 'input',
     id: 'email',
     value: '',
     placeholder: 'Email',
     required: true,
   },
   {
-    type: 'textarea',
+    componentType: 'textarea',
     id: 'message',
     value: '',
     placeholder: 'Message',
     required: true,
   },
+  
 ];
 
 function App() {

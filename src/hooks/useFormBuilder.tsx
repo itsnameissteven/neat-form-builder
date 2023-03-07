@@ -9,13 +9,13 @@ import {
   getValues,
 } from '../utils';
 
-const useFormBuilder = <T extends IBaseValue>({
+const useFormBuilder = <T extends FBBaseValue>({
   data,
   onSubmit,
   resetOnSubmit = false,
 }: IOptions<T>) => {
   const [formState, formDispatch] = useReducer(
-    formReducer,
+    formReducer<T>,
     getInitialData(data)
   );
 
